@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10091b">
+  <meta name="description" content="Dechef30 的个人主页：成长轨迹、学习经历、项目成果与兴趣坐标。">
+  <title>Dechef30 | Personal Log</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <canvas id="ambientCanvas" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="paw-cursor" id="pawCursor" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><b></b>
+  </div>
+  <div class="cursor-halo" id="cursorHalo" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <nav class="nav-shell" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="Dechef30 首页">
+        <span class="brand-mark">D<span>30</span></span>
+        <span class="brand-copy">DECHEF<small>PERSONAL LOG</small></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span class="sr-only">打开导航</span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#about">现在</a>
+        <a href="#journey">航线</a>
+        <a href="#interests">热爱</a>
+        <a href="#work">成果</a>
+        <a class="nav-contact" href="#contact">联系我</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero section-shell" aria-labelledby="hero-title">
+      <div class="hero-copy" data-reveal>
+        <p class="overline"><span class="status-dot"></span> SCUT · Guangzhou · Keep exploring</p>
+        <h1 id="hero-title">向喜欢的方向，<br><em>再走远一点。</em></h1>
+        <p class="hero-lead">
+          你好，我是 <strong>Dechef30</strong>。这里收录我的成长路径、学习与项目，
+          也保留那些让我持续好奇的事物。
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary magnetic" href="#journey">查看成长航线 <span>↘</span></a>
+          <span class="button button-quiet">177 XXXX XXXX</span>
+        </div>
+        <div class="hero-meta" aria-label="个人关键词">
+          <span>One Piece spirit</span>
+          <span>Dub Nation · 30</span>
+          <span>K-pop playlist</span>
+        </div>
+      </div>
+
+      <div class="route-visual" data-reveal aria-label="从上海到广州的成长航线示意图">
+        <div class="route-topline"><span>GROWTH ROUTE</span><span>31.23°N → 23.13°N</span></div>
+        <svg class="route-map" viewBox="0 0 540 550" role="img" aria-label="上海至广州航线">
+          <defs>
+            <linearGradient id="routeGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff86c8"/>
+              <stop offset="1" stop-color="#8d68ff"/>
+            </linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path class="map-contour contour-one" d="M71 92C132 32 222 42 284 87s93 19 143 64 45 121 5 160-18 91-71 138-133 65-198 16S64 371 72 302 19 143 71 92Z"/>
+          <path class="map-contour contour-two" d="M112 124c55-46 118-34 171 1s92 14 121 66 7 91-24 131-20 86-80 110-120-2-154-49-29-98-43-143 9-79 9-118Z"/>
+          <path class="route-path" pathLength="1" d="M376 157C320 188 282 231 261 282S224 371 167 406"/>
+          <circle class="route-node node-sh" cx="376" cy="157" r="8"/>
+          <circle class="route-node node-gz" cx="167" cy="406" r="8"/>
+          <g class="route-label label-sh"><text x="393" y="150">SHANGHAI</text><text class="cn" x="393" y="171">成长起点</text></g>
+          <g class="route-label label-gz"><text x="55" y="405">GUANGZHOU</text><text class="cn" x="83" y="426">正在探索</text></g>
+          <g class="moving-paw" filter="url(#glow)">
+            <circle cx="0" cy="-7" r="3"/><circle cx="7" cy="-2" r="3"/><circle cx="-7" cy="-2" r="3"/><path d="M0-1c7 0 10 11 0 13-10-2-7-13 0-13Z"/>
+          </g>
+        </svg>
+        <div class="profile-ticket">
+          <span class="ticket-no">LOG 030</span>
+          <div><strong>华南理工大学</strong><small>South China University of Technology</small></div>
+          <span class="ticket-state">IN PROGRESS</span>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#about" aria-label="向下浏览"><span></span>SCROLL</a>
+    </section>
+
+    <section class="intro section-shell" id="about" aria-labelledby="about-title">
+      <div class="section-index" data-reveal><span>NOW</span><i></i><b>关于我</b></div>
+      <div class="intro-grid">
+        <div class="section-heading" data-reveal>
+          <p class="overline">CURRENT CHAPTER</p>
+          <h2 id="about-title">我还在定义自己，<br>但方向已经清晰。</h2>
+        </div>
+        <div class="intro-copy" data-reveal>
+          <p class="intro-large">从上海来到广州，我正在华南理工大学继续自己的学习旅程。</p>
+          <p>这个主页会随着我一起更新。现在，它先记录成长、热爱和准备发生的项目；以后，成绩、作品和更完整的个人故事都会在这里落位。</p>
+          <dl class="quick-facts">
+            <div><dt>所在地</dt><dd>广州 / 上海</dd></div>
+            <div><dt>当前身份</dt><dd>华南理工大学学生</dd></div>
+            <div><dt>关注方向</dt><dd>待补充</dd></div>
+            <div><dt>个人状态</dt><dd>学习 · 实践 · 记录</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="journey section-shell" id="journey" aria-labelledby="journey-title">
+      <div class="section-index" data-reveal><span>ROUTE</span><i></i><b>成长航线</b></div>
+      <div class="journey-heading" data-reveal>
+        <p class="overline">FOUR STOPS · ONE CONTINUING STORY</p>
+        <h2 id="journey-title">从七宝出发，<br>下一站仍未写完。</h2>
+      </div>
+      <ol class="timeline">
+        <li class="timeline-item" data-reveal>
+          <span class="timeline-year">PRIMARY</span>
+          <div class="timeline-marker"><b>01</b></div>
+          <article>
+            <p>成长起点 · 上海七宝</p>
+            <h3>闵行区七宝镇明强小学</h3>
+            <p>创办于 1905 年的百年学校。这里是学习习惯、好奇心与集体意识开始生长的地方。</p>
+            <a href="https://mqxx.mhedu.sh.cn/" target="_blank" rel="noreferrer">访问学校官网 <span>↗</span></a>
+          </article>
+        </li>
+        <li class="timeline-item" data-reveal>
+          <span class="timeline-year">MIDDLE</span>
+          <div class="timeline-marker"><b>02</b></div>
+          <article>
+            <p>方法形成 · 上海七宝</p>
+            <h3>上海市闵行区七宝第二中学</h3>
+            <p>学习从“完成”走向“理解”，独立思考和自我管理也在这一阶段慢慢形成。</p>
+            <a href="https://qb2z.mhedu.sh.cn/" target="_blank" rel="noreferrer">访问学校官网 <span>↗</span></a>
+          </article>
+        </li>
+        <li class="timeline-item" data-reveal>
+          <span class="timeline-year">HIGH</span>
+          <div class="timeline-marker"><b>03</b></div>
+          <article>
+            <p>目标清晰 · 上海闵行</p>
+            <h3>上海师范大学附属中学闵行分校</h3>
+            <p>目标感和综合能力快速成长的阶段，也开始更认真地思考大学与未来的方向。</p>
+            <a href="https://sdfz.mhedu.sh.cn/" target="_blank" rel="noreferrer">访问学校官网 <span>↗</span></a>
+          </article>
+        </li>
+        <li class="timeline-item current" data-reveal>
+          <span class="timeline-year">UNIVERSITY</span>
+          <div class="timeline-marker"><b>04</b></div>
+          <article>
+            <p>正在发生 · 广州</p>
+            <h3>华南理工大学</h3>
+            <p>教育部直属、以工见长的综合性研究型大学。新的城市、更大的校园，以及更丰富的专业学习和项目实践正在展开。</p>
+            <a href="https://www.scut.edu.cn/" target="_blank" rel="noreferrer">访问学校官网 <span>↗</span></a>
+          </article>
+        </li>
+      </ol>
+    </section>
+
+    <section class="interests" id="interests" aria-labelledby="interests-title">
+      <div class="section-shell">
+        <div class="section-index light" data-reveal><span>SIGNALS</span><i></i><b>兴趣坐标</b></div>
+        <div class="interest-heading" data-reveal>
+          <div><p class="overline">THINGS THAT KEEP ME CURIOUS</p><h2 id="interests-title">热爱，也是认识我的入口。</h2></div>
+          <p>四种频率，一套属于 Dechef30 的个人信号。</p>
+        </div>
+        <div class="signal-grid">
+          <article class="signal-card one-piece" data-reveal>
+            <span class="signal-no">01</span>
+            <div class="paw-emblem" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+            <div><p>ADVENTURE / FREEDOM</p><h3>ONE PIECE</h3><span>冒险、伙伴与向自由出发的勇气。</span></div>
+          </article>
+          <article class="signal-card curry" data-reveal>
+            <span class="signal-no">02</span>
+            <div class="thirty" aria-hidden="true">30</div>
+            <div><p>FOCUS / PRACTICE</p><h3>STEPHEN CURRY</h3><span>相信训练，也相信下一次出手。</span></div>
+          </article>
+          <article class="signal-card music" data-reveal>
+            <span class="signal-no">03</span>
+            <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div><p>STAGE / ENERGY</p><h3>BABYMONSTER</h3><span>鲜明、有冲击力的舞台能量。</span></div>
+          </article>
+          <article class="signal-card aespa" data-reveal>
+            <span class="signal-no">04</span>
+            <div class="ae-mark" aria-hidden="true">æ</div>
+            <div><p>FUTURE / ATTITUDE</p><h3>AESPA</h3><span>未来感视觉与独特的音乐气质。</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="work section-shell" id="work" aria-labelledby="work-title">
+      <div class="section-index" data-reveal><span>ARCHIVE</span><i></i><b>成果档案</b></div>
+      <div class="work-heading" data-reveal>
+        <div><p class="overline">ACHIEVEMENTS &amp; PROJECTS</p><h2 id="work-title">先搭好舞台，<br>再让作品说话。</h2></div>
+        <p>下面是为后续内容准备的正式结构。你只需要给我真实资料，我会继续把它们变成完整的成果档案。</p>
+      </div>
+      <div class="work-grid">
+        <article class="work-card featured" data-reveal>
+          <span class="work-type">PROJECT / 001</span>
+          <h3>项目经历<br><em>即将更新</em></h3>
+          <p>项目背景、个人职责、技术方法与最终成果会在这里形成完整叙事。</p>
+          <div class="placeholder-lines"><i></i><i></i><i></i></div>
+        </article>
+        <article class="work-card" data-reveal>
+          <span class="work-type">ACADEMIC</span><span class="work-icon">A+</span>
+          <h3>学习成绩</h3><p>绩点、排名、核心课程与奖学金。</p><span class="coming">待补充</span>
+        </article>
+        <article class="work-card" data-reveal>
+          <span class="work-type">HONORS</span><span class="work-icon">◇</span>
+          <h3>竞赛荣誉</h3><p>竞赛、证书、校内外奖励与成果证明。</p><span class="coming">待补充</span>
+        </article>
+        <article class="work-card" data-reveal>
+          <span class="work-type">SKILLS</span><span class="work-icon">↗</span>
+          <h3>能力地图</h3><p>专业工具、语言能力、协作与表达。</p><span class="coming">待补充</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact section-shell" id="contact" aria-labelledby="contact-title">
+      <div class="contact-card" data-reveal>
+        <p class="overline">NEXT CONNECTION</p>
+        <h2 id="contact-title">认识我的下一步，<br><em>从一句你好开始。</em></h2>
+        <span class="contact-phone"><span>PHONE</span>177 XXXX XXXX <b>PRIVATE</b></span>
+        <p class="contact-note">其他联系方式与社交账号将在确认后补充。</p>
+        <div class="contact-orbit" aria-hidden="true"><span>D30</span><i></i></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer section-shell">
+    <span>© <span id="year"></span> DECHEF30</span>
+    <span>BUILT AROUND CURIOSITY</span>
+    <a href="#top">BACK TO TOP ↑</a>
+  </footer>
+</body>
+</html>
