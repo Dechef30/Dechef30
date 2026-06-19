@@ -40,12 +40,28 @@ const travelPlaces = {
 };
 
 const mapPositions = {
-  guangzhou: { label: "广州", x: 64, y: 79 }, shanghai: { label: "上海", x: 78, y: 47 },
-  nantong: { label: "南通", x: 75, y: 44 }, xuzhou: { label: "徐州", x: 69, y: 42 },
-  xiamen: { label: "厦门", x: 73, y: 71 }, hongkong: { label: "香港", x: 69, y: 82 },
-  macau: { label: "澳门", x: 66, y: 84 }, tokyo: { label: "东京", x: 92, y: 34 },
-  osaka: { label: "大阪", x: 90, y: 42 }, singapore: { label: "新加坡", x: 84, y: 94 },
-  paris: { label: "巴黎", x: 10, y: 26 }, helsinki: { label: "赫尔辛基", x: 17, y: 13 }
+  guangzhou: { label: "广州", lon: 113.26, lat: 23.13 },
+  shanghai: { label: "上海", lon: 121.47, lat: 31.23 },
+  nantong: { label: "南通", lon: 120.89, lat: 31.98 },
+  xuzhou: { label: "徐州", lon: 117.28, lat: 34.2 },
+  yangzhou: { label: "扬州", lon: 119.42, lat: 32.39 },
+  suzhou: { label: "苏州", lon: 120.58, lat: 31.3 },
+  taishan: { label: "泰山", lon: 117.1, lat: 36.25 },
+  shaanxi: { label: "陕西", lon: 108.94, lat: 34.34 },
+  huashan: { label: "华山", lon: 110.09, lat: 34.48 },
+  sichuan: { label: "四川", lon: 104.07, lat: 30.67 },
+  xiamen: { label: "厦门", lon: 118.08, lat: 24.48 },
+  shaoxing: { label: "绍兴", lon: 120.58, lat: 30 },
+  hongkong: { label: "香港", lon: 114.17, lat: 22.32 },
+  macau: { label: "澳门", lon: 113.54, lat: 22.2 },
+  nara: { label: "奈良", lon: 135.8, lat: 34.68 },
+  kyoto: { label: "京都", lon: 135.76, lat: 35.01 },
+  osaka: { label: "大阪", lon: 135.5, lat: 34.69 },
+  tokyo: { label: "东京", lon: 139.69, lat: 35.68 },
+  singapore: { label: "新加坡", lon: 103.82, lat: 1.35 },
+  belgium: { label: "比利时", lon: 4.35, lat: 50.85 },
+  paris: { label: "巴黎", lon: 2.35, lat: 48.86 },
+  helsinki: { label: "赫尔辛基", lon: 24.94, lat: 60.17 }
 };
 
 year.textContent = new Date().getFullYear();
@@ -184,6 +200,229 @@ let activePlace = "tokyo";
 let activePhotoIndex = 0;
 let photoTimer;
 const photoStage = document.querySelector("#photoStage");
+let currentLocationKey = localStorage.getItem("dechef30-current-location") || "guangzhou";
+let globeApi;
+
+async function initGlobe() {
+  const mapStage = document.querySelector("#mapStage");
+  const svgNode = document.querySelector("#globeSvg");
+  const loading = document.querySelector("#globeLoading");
+  if (!mapStage || !svgNode || typeof d3 === "undefined" || typeof topojson === "undefined") {
+    if (loading) loading.textContent = "地图组件加载失败，请刷新重试。";
+    return;
+  }
+
+  const defaultRotation = [-104, -35, 0];
+  const homeKeys = new Set(["shanghai", "nantong", "xuzhou"]);
+  const projection = d3.geoOrthographic().precision(0.3).clipAngle(90).rotate(defaultRotation);
+  const path = d3.geoPath(projection);
+  const svg = d3.select(svgNode);
+  const ocean = svg.select(".globe-ocean");
+  const graticule = svg.select("#globeGraticule");
+  const countryLayer = svg.select("#countryLayer");
+  const markerLayer = svg.select("#markerLayer");
+  let width = 0;
+  let height = 0;
+  let baseScale = 1;
+  let zoom = 0.94;
+  let countries = [];
+  let viewAnimation;
+
+  const markerData = Object.entries(travelPlaces)
+    .filter(([key]) => mapPositions[key])
+    .map(([key]) => ({ key, ...mapPositions[key] }));
+
+  function isVisible(location) {
+    const rotation = projection.rotate();
+    const center = [-rotation[0], -rotation[1]];
+    return d3.geoDistance([location.lon, location.lat], center) < Math.PI / 2 - 0.015;
+  }
+
+  function renderAvatar() {
+    const location = mapPositions[currentLocationKey] || mapPositions.guangzhou;
+    const point = projection([location.lon, location.lat]);
+    const avatar = document.querySelector("#currentAvatar");
+    if (!point || !isVisible(location)) {
+      avatar.classList.add("is-behind");
+      return;
+    }
+    avatar.style.left = `${point[0]}px`;
+    avatar.style.top = `${point[1]}px`;
+    avatar.classList.remove("is-behind");
+    avatar.classList.add("is-ready");
+  }
+
+  function render() {
+    projection.translate([width / 2, height / 2]).scale(baseScale * zoom);
+    ocean.attr("cx", width / 2).attr("cy", height / 2).attr("r", projection.scale());
+    graticule.attr("d", path(d3.geoGraticule10()));
+    countryLayer.selectAll("path").attr("d", path);
+    markerLayer.selectAll(".globe-marker").each(function updateMarker(location) {
+      const marker = d3.select(this);
+      const visible = isVisible(location);
+      const point = projection([location.lon, location.lat]);
+      marker
+        .attr("transform", point ? `translate(${point[0]},${point[1]})` : null)
+        .attr("visibility", visible ? "visible" : "hidden")
+        .style("pointer-events", visible ? "auto" : "none");
+    });
+    renderAvatar();
+    document.querySelector("#globeScale").textContent = `${Math.round(zoom * 100)}%`;
+  }
+
+  function layout() {
+    const bounds = mapStage.getBoundingClientRect();
+    width = Math.max(320, bounds.width);
+    height = Math.max(360, bounds.height);
+    baseScale = Math.min(width, height) * 0.455;
+    svg.attr("viewBox", `0 0 ${width} ${height}`);
+    render();
+  }
+
+  function setZoom(nextZoom) {
+    zoom = Math.max(0.64, Math.min(2.6, nextZoom));
+    render();
+  }
+
+  function animateView(targetRotation, targetZoom = zoom) {
+    cancelAnimationFrame(viewAnimation);
+    const startRotation = projection.rotate();
+    const adjustedTarget = [...targetRotation];
+    let longitudeDelta = adjustedTarget[0] - startRotation[0];
+    if (longitudeDelta > 180) adjustedTarget[0] -= 360;
+    if (longitudeDelta < -180) adjustedTarget[0] += 360;
+    const startZoom = zoom;
+    const startedAt = performance.now();
+    const duration = reduceMotion.matches ? 0 : 720;
+
+    function step(now) {
+      const progress = duration ? Math.min(1, (now - startedAt) / duration) : 1;
+      const eased = d3.easeCubicInOut(progress);
+      projection.rotate(startRotation.map((value, index) => value + (adjustedTarget[index] - value) * eased));
+      zoom = startZoom + (targetZoom - startZoom) * eased;
+      render();
+      if (progress < 1) viewAnimation = requestAnimationFrame(step);
+    }
+    viewAnimation = requestAnimationFrame(step);
+  }
+
+  function focusLocation(key) {
+    const location = mapPositions[key];
+    if (!location) return;
+    animateView([-location.lon, -location.lat, 0], Math.max(zoom, 1.08));
+  }
+
+  try {
+    const response = await fetch("./assets/maps/countries-50m.json");
+    if (!response.ok) throw new Error(`Map data ${response.status}`);
+    const world = await response.json();
+    countries = topojson.feature(world, world.objects.countries).features;
+    countryLayer.selectAll("path")
+      .data(countries)
+      .join("path")
+      .attr("class", (country) => `country${String(country.id) === "156" ? " is-china" : ""}`);
+
+    const markers = markerLayer.selectAll(".globe-marker")
+      .data(markerData, (location) => location.key)
+      .join((enter) => {
+        const group = enter.append("g")
+          .attr("class", (location) => `globe-marker${homeKeys.has(location.key) ? " is-home" : ""}`)
+          .attr("data-place", (location) => location.key)
+          .attr("role", "button")
+          .attr("tabindex", 0)
+          .attr("aria-label", (location) => `查看${location.label}的旅途经历`);
+        group.append("circle").attr("class", "marker-pulse").attr("r", 10);
+        group.append("circle").attr("class", "marker-core").attr("r", (location) => homeKeys.has(location.key) ? 6 : 5);
+        group.append("text").attr("class", "marker-label").attr("dy", -13).text((location) => location.label);
+        group.append("title").text((location) => location.label);
+        return group;
+      });
+    markers.on("click", (event, location) => {
+      event.stopPropagation();
+      selectPlace(location.key, true);
+    }).on("keydown", (event, location) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      selectPlace(location.key, true);
+    });
+
+    loading.classList.add("is-hidden");
+    globeApi = { render, focus: focusLocation, setLocation: renderAvatar, reset: () => animateView(defaultRotation, 0.94) };
+    new ResizeObserver(layout).observe(mapStage);
+    layout();
+  } catch (error) {
+    console.error(error);
+    loading.textContent = "地图数据加载失败，请刷新重试。";
+    return;
+  }
+
+  const activePointers = new Map();
+  let dragState;
+  let pinchState;
+
+  function startDrag(pointer) {
+    dragState = { id: pointer.pointerId, x: pointer.clientX, y: pointer.clientY, rotation: [...projection.rotate()] };
+    mapStage.classList.add("is-dragging");
+  }
+
+  mapStage.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("#currentAvatar") || event.target.closest(".globe-controls")) return;
+    if (event.pointerType === "mouse" && event.button !== 2) return;
+    event.preventDefault();
+    mapStage.setPointerCapture(event.pointerId);
+    activePointers.set(event.pointerId, { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY });
+    if (activePointers.size === 1) startDrag(event);
+    if (activePointers.size === 2) {
+      const [first, second] = [...activePointers.values()];
+      pinchState = { distance: Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY), zoom };
+      dragState = null;
+    }
+  });
+
+  mapStage.addEventListener("pointermove", (event) => {
+    if (!activePointers.has(event.pointerId)) return;
+    activePointers.set(event.pointerId, { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY });
+    if (activePointers.size >= 2 && pinchState) {
+      const [first, second] = [...activePointers.values()];
+      const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+      setZoom(pinchState.zoom * distance / Math.max(1, pinchState.distance));
+      return;
+    }
+    if (!dragState || dragState.id !== event.pointerId) return;
+    const dx = event.clientX - dragState.x;
+    const dy = event.clientY - dragState.y;
+    projection.rotate([
+      dragState.rotation[0] - dx * 0.34 / zoom,
+      Math.max(-85, Math.min(85, dragState.rotation[1] + dy * 0.34 / zoom)),
+      0
+    ]);
+    render();
+  });
+
+  function endPointer(event) {
+    activePointers.delete(event.pointerId);
+    pinchState = null;
+    if (activePointers.size === 1) startDrag([...activePointers.values()][0]);
+    else if (!activePointers.size) {
+      dragState = null;
+      mapStage.classList.remove("is-dragging");
+    }
+  }
+  mapStage.addEventListener("pointerup", endPointer);
+  mapStage.addEventListener("pointercancel", endPointer);
+  mapStage.addEventListener("lostpointercapture", endPointer);
+  mapStage.addEventListener("contextmenu", (event) => {
+    if (!event.target.closest("#currentAvatar")) event.preventDefault();
+  });
+  mapStage.addEventListener("wheel", (event) => {
+    if (!event.ctrlKey) return;
+    event.preventDefault();
+    setZoom(zoom * Math.exp(-event.deltaY * 0.0015));
+  }, { passive: false });
+  document.querySelector("#globeZoomIn").addEventListener("click", () => setZoom(zoom + 0.14));
+  document.querySelector("#globeZoomOut").addEventListener("click", () => setZoom(zoom - 0.14));
+  document.querySelector("#globeReset").addEventListener("click", () => animateView(defaultRotation, 0.94));
+}
 
 function updatePhoto() {
   const photos = [...photoStage.querySelectorAll(".travel-photo")];
@@ -201,7 +440,7 @@ function restartPhotoTimer() {
   photoTimer = setInterval(() => { activePhotoIndex = (activePhotoIndex + 1) % count; updatePhoto(); }, 4800);
 }
 
-function selectPlace(key, shouldScroll = false) {
+function selectPlace(key, shouldScroll = false, shouldFocus = false) {
   const place = travelPlaces[key];
   if (!place) return;
   activePlace = key;
@@ -233,10 +472,11 @@ function selectPlace(key, shouldScroll = false) {
   document.querySelector("#photoNext").hidden = !hasMultiple;
   updatePhoto();
   restartPhotoTimer();
+  if (shouldFocus) globeApi?.focus(key);
   if (shouldScroll && window.innerWidth < 980) document.querySelector("#travelStory").scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
 }
 
-document.querySelectorAll("[data-place]").forEach((button) => button.addEventListener("click", () => selectPlace(button.dataset.place, true)));
+document.querySelectorAll(".world-routes [data-place]").forEach((button) => button.addEventListener("click", () => selectPlace(button.dataset.place, true, true)));
 document.querySelector("#photoPrev").addEventListener("click", () => {
   const count = travelPlaces[activePlace].images.length;
   activePhotoIndex = (activePhotoIndex - 1 + count) % count;
@@ -269,9 +509,10 @@ function closeLocationDialog() {
   else locationDialog.removeAttribute("open");
 }
 
-currentAvatar.addEventListener("contextmenu", (event) => { event.preventDefault(); openLocationDialog(); });
+currentAvatar.addEventListener("contextmenu", (event) => { event.preventDefault(); event.stopPropagation(); openLocationDialog(); });
 let longPressTimer;
 currentAvatar.addEventListener("pointerdown", (event) => {
+  event.stopPropagation();
   if (event.pointerType === "mouse") return;
   longPressTimer = setTimeout(openLocationDialog, 700);
 });
@@ -292,14 +533,17 @@ document.querySelector("#locationPasswordForm").addEventListener("submit", async
 });
 
 function applyCurrentLocation(key, persist = true) {
-  const location = mapPositions[key] || mapPositions.guangzhou;
-  currentAvatar.style.setProperty("--x", `${location.x}%`);
-  currentAvatar.style.setProperty("--y", `${location.y}%`);
+  currentLocationKey = key in mapPositions ? key : "guangzhou";
+  const location = mapPositions[currentLocationKey];
   currentAvatar.setAttribute("aria-label", `李圣鑫当前在${location.label}，右键可更新位置`);
   document.querySelector("#avatarLocationLabel").textContent = `${location.label} · NOW`;
   document.querySelector("#currentLocationText").textContent = location.label;
-  document.querySelector("#locationSelect").value = key in mapPositions ? key : "guangzhou";
-  if (persist) localStorage.setItem("dechef30-current-location", key);
+  document.querySelector("#locationSelect").value = currentLocationKey;
+  globeApi?.setLocation();
+  if (persist) {
+    localStorage.setItem("dechef30-current-location", currentLocationKey);
+    globeApi?.focus(currentLocationKey);
+  }
 }
 
 document.querySelector("#locationEditForm").addEventListener("submit", (event) => {
@@ -307,7 +551,8 @@ document.querySelector("#locationEditForm").addEventListener("submit", (event) =
   applyCurrentLocation(document.querySelector("#locationSelect").value);
   closeLocationDialog();
 });
-applyCurrentLocation(localStorage.getItem("dechef30-current-location") || "guangzhou", false);
+applyCurrentLocation(currentLocationKey, false);
+initGlobe();
 
 const finePointer = window.matchMedia("(pointer: fine)").matches;
 const paw = document.querySelector("#pawCursor");

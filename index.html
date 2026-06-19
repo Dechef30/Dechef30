@@ -7,8 +7,10 @@
   <meta name="description" content="李圣鑫 Dechef30 的个人主页：成长轨迹、旅行地图、学习经历、兴趣与项目成果。">
   <title>Dechef30 | 李圣鑫的个人航海日志</title>
   <link rel="icon" href="./assets/straw-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=4">
-  <script src="./script.js?v=3" defer></script>
+  <link rel="stylesheet" href="./style.css?v=5">
+  <script src="./assets/vendor/d3.min.js" defer></script>
+  <script src="./assets/vendor/topojson-client.min.js" defer></script>
+  <script src="./script.js?v=4" defer></script>
 </head>
 <body class="is-locked">
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -146,32 +148,30 @@
 
       <div class="travel-dashboard" data-reveal>
         <div class="map-panel">
-          <div class="map-toolbar"><span>CHINA · MY ROUTES</span><span class="map-legend"><i class="home"></i>家与故乡 <i class="visited"></i>去过</span></div>
+          <div class="map-toolbar"><span>WORLD · MY ROUTES</span><span class="map-legend"><i class="home"></i>家与故乡 <i class="visited"></i>去过</span></div>
           <div class="map-stage" id="mapStage">
-            <svg class="china-shape" viewBox="0 0 720 570" aria-hidden="true">
-              <defs><linearGradient id="chinaFill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#342443"/><stop offset="1" stop-color="#171020"/></linearGradient></defs>
-              <path d="M136 151 196 96l79 10 48-45 82 27 44 57 96 7 35 59-20 51 43 50-52 48-26 76-85 20-61 59-79-35-60 28-70-48-74-13-19-72 28-64-24-65 55-45Z" fill="url(#chinaFill)" stroke="#8e70b5" stroke-width="3"/>
-              <g class="province-lines" fill="none" stroke="#816e91" stroke-width="1.2" opacity=".42"><path d="M196 96 224 172l-88-21m88 21 99-111-8 132 90-105 4 119 136-55-60 117 95-58-97 137 120-36M315 193 238 260l-133-9m133 9-20 118-122-3m122 3 82 102 2-115 77 150m-77-150 107-158 74 141m-181 17 183-96m-183 96 259 71"/><path d="M170 448 302 365 551 436M240 488l62-123-227 10M440 456 409 207"/></g>
-              <path class="sea-dash" d="M560 262c68 7 89 52 67 104s-8 88 42 121" fill="none" stroke="#ff7bbb" stroke-width="2" stroke-dasharray="5 10" opacity=".55"/>
+            <svg class="globe-svg" id="globeSvg" role="application" aria-label="可旋转缩放的世界旅行地图。按住鼠标右键拖动旋转，按住 Control 并滚动缩放。">
+              <defs>
+                <radialGradient id="oceanGradient" cx="38%" cy="30%"><stop offset="0" stop-color="#3d2a52"/><stop offset=".66" stop-color="#1f142d"/><stop offset="1" stop-color="#100a18"/></radialGradient>
+                <filter id="globeGlow"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <circle class="globe-ocean"></circle>
+              <path class="globe-graticule" id="globeGraticule"></path>
+              <g class="country-layer" id="countryLayer"></g>
+              <g class="marker-layer" id="markerLayer"></g>
             </svg>
-            <button class="map-pin is-home" style="--x:78%;--y:47%" data-place="shanghai" aria-label="上海，家"><span>上海</span></button>
-            <button class="map-pin is-home small" style="--x:75%;--y:44%" data-place="nantong" aria-label="南通，老家"><span>南通</span></button>
-            <button class="map-pin is-home small" style="--x:69%;--y:42%" data-place="xuzhou" aria-label="徐州，老家"><span>徐州</span></button>
-            <button class="map-pin small" style="--x:72%;--y:50%" data-place="yangzhou" aria-label="扬州"><span>扬州</span></button>
-            <button class="map-pin small" style="--x:80%;--y:52%" data-place="suzhou" aria-label="苏州"><span>苏州</span></button>
-            <button class="map-pin" style="--x:70%;--y:36%" data-place="taishan" aria-label="山东泰山"><span>泰山</span></button>
-            <button class="map-pin" style="--x:51%;--y:51%" data-place="shaanxi" aria-label="陕西"><span>陕西</span></button>
-            <button class="map-pin small" style="--x:47%;--y:57%" data-place="huashan" aria-label="华山"><span>华山</span></button>
-            <button class="map-pin" style="--x:42%;--y:64%" data-place="sichuan" aria-label="四川"><span>四川</span></button>
-            <button class="map-pin" style="--x:73%;--y:71%" data-place="xiamen" aria-label="厦门"><span>厦门</span></button>
-            <button class="map-pin small" style="--x:80%;--y:58%" data-place="shaoxing" aria-label="绍兴"><span>绍兴</span></button>
-            <button class="map-pin small" style="--x:69%;--y:82%" data-place="hongkong" aria-label="香港"><span>香港</span></button>
-            <button class="map-pin small" style="--x:66%;--y:84%" data-place="macau" aria-label="澳门"><span>澳门</span></button>
-            <button class="current-avatar" id="currentAvatar" style="--x:64%;--y:79%" aria-label="李圣鑫当前在广州，右键可更新位置">
+            <button class="current-avatar globe-avatar" id="currentAvatar" aria-label="李圣鑫当前在广州，右键可更新位置">
               <img src="./assets/straw-mark.svg" alt=""><span id="avatarLocationLabel">广州 · NOW</span>
             </button>
+            <div class="globe-controls" aria-label="地图比例尺控制">
+              <button id="globeZoomOut" type="button" aria-label="缩小地图">−</button>
+              <span id="globeScale">100%</span>
+              <button id="globeZoomIn" type="button" aria-label="放大地图">＋</button>
+              <button class="reset" id="globeReset" type="button">回到中国</button>
+            </div>
+            <div class="globe-loading" id="globeLoading">正在展开世界地图…</div>
           </div>
-          <p class="map-tip">右键点击草帽头像，可输入管理密码更新“我的当前位置”。移动端长按头像也可以。</p>
+          <p class="map-tip"><b>右键按住拖动</b>旋转地球，<b>Ctrl + 滚轮</b>缩放。右键草帽头像可更新当前位置，移动端用单指拖动、双指缩放。</p>
           <div class="world-routes" aria-label="海外城市">
             <span>WORLD ROUTES</span>
             <button data-place="nara">奈良</button><button data-place="kyoto">京都</button><button data-place="osaka">大阪</button><button data-place="tokyo">东京</button>
