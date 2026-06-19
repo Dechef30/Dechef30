@@ -196,7 +196,7 @@ if ("IntersectionObserver" in window) {
   sections.forEach((section) => sectionObserver.observe(section));
 }
 
-let activePlace = "tokyo";
+let activePlace = "sichuan";
 let activePhotoIndex = 0;
 let photoTimer;
 const photoStage = document.querySelector("#photoStage");
@@ -326,7 +326,7 @@ async function initGlobe() {
       .data(markerData, (location) => location.key)
       .join((enter) => {
         const group = enter.append("g")
-          .attr("class", (location) => `globe-marker${homeKeys.has(location.key) ? " is-home" : ""}`)
+          .attr("class", (location) => `globe-marker${homeKeys.has(location.key) ? " is-home" : ""}${location.key === activePlace ? " is-active" : ""}`)
           .attr("data-place", (location) => location.key)
           .attr("role", "button")
           .attr("tabindex", 0)
@@ -489,7 +489,7 @@ document.querySelector("#photoNext").addEventListener("click", () => {
 });
 photoStage.addEventListener("pointerenter", () => clearInterval(photoTimer));
 photoStage.addEventListener("pointerleave", restartPhotoTimer);
-selectPlace("tokyo");
+selectPlace("sichuan");
 
 const locationDialog = document.querySelector("#locationDialog");
 const currentAvatar = document.querySelector("#currentAvatar");
