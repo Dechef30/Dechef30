@@ -280,7 +280,7 @@ async function initGlobe() {
   }
 
   function setZoom(nextZoom) {
-    zoom = Math.max(0.64, Math.min(2.6, nextZoom));
+    zoom = Math.max(0.64, Math.min(3, nextZoom));
     render();
   }
 
@@ -366,8 +366,8 @@ async function initGlobe() {
   }
 
   mapStage.addEventListener("pointerdown", (event) => {
-    if (event.target.closest("#currentAvatar") || event.target.closest(".globe-controls")) return;
-    if (event.pointerType === "mouse" && event.button !== 2) return;
+    if (event.target.closest("#currentAvatar") || event.target.closest(".globe-controls") || event.target.closest(".globe-marker")) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
     event.preventDefault();
     mapStage.setPointerCapture(event.pointerId);
     activePointers.set(event.pointerId, { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY });
@@ -411,9 +411,6 @@ async function initGlobe() {
   mapStage.addEventListener("pointerup", endPointer);
   mapStage.addEventListener("pointercancel", endPointer);
   mapStage.addEventListener("lostpointercapture", endPointer);
-  mapStage.addEventListener("contextmenu", (event) => {
-    if (!event.target.closest("#currentAvatar")) event.preventDefault();
-  });
   mapStage.addEventListener("wheel", (event) => {
     if (!event.ctrlKey) return;
     event.preventDefault();

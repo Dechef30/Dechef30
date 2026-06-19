@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./style.css?v=5">
   <script src="./assets/vendor/d3.min.js" defer></script>
   <script src="./assets/vendor/topojson-client.min.js" defer></script>
-  <script src="./script.js?v=5" defer></script>
+  <script src="./script.js?v=6" defer></script>
 </head>
 <body class="is-locked">
   <a class="skip-link" href="#main">跳到主要内容</a>
@@ -150,7 +150,7 @@
         <div class="map-panel">
           <div class="map-toolbar"><span>WORLD · MY ROUTES</span><span class="map-legend"><i class="home"></i>家与故乡 <i class="visited"></i>去过</span></div>
           <div class="map-stage" id="mapStage">
-            <svg class="globe-svg" id="globeSvg" role="application" aria-label="可旋转缩放的世界旅行地图。按住鼠标右键拖动旋转，按住 Control 并滚动缩放。">
+            <svg class="globe-svg" id="globeSvg" role="application" aria-label="可旋转缩放的世界旅行地图。按住鼠标左键拖动旋转，按住 Control 并滚动缩放。">
               <defs>
                 <radialGradient id="oceanGradient" cx="38%" cy="30%"><stop offset="0" stop-color="#3d2a52"/><stop offset=".66" stop-color="#1f142d"/><stop offset="1" stop-color="#100a18"/></radialGradient>
                 <filter id="globeGlow"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -171,7 +171,7 @@
             </div>
             <div class="globe-loading" id="globeLoading">正在展开世界地图…</div>
           </div>
-          <p class="map-tip"><b>右键按住拖动</b>旋转地球，<b>Ctrl + 滚轮</b>缩放。右键草帽头像可更新当前位置，移动端用单指拖动、双指缩放。</p>
+          <p class="map-tip"><b>左键按住拖动</b>旋转地球，<b>Ctrl + 滚轮</b>缩放，最高 300%。右键草帽头像可更新当前位置，移动端用单指拖动、双指缩放。</p>
           <div class="world-routes" aria-label="海外城市">
             <span>WORLD ROUTES</span>
             <button data-place="nara">奈良</button><button data-place="kyoto">京都</button><button data-place="osaka">大阪</button><button data-place="tokyo">东京</button>
